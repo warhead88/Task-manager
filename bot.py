@@ -2,12 +2,16 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+
 from config import Config
+from db import init_db
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
+
+init_db()
 
 async def main():
     bot = Bot(token=Config.BOT_TOKEN)

@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 
 from config import Config
 from db import init_db
+from handlers import start
 
 logging.basicConfig(
     level=logging.INFO,

@@ -3,3 +3,4 @@ __pycache__
 .venv
 handlers/__pycache__
 keyboards/__pycache__
+main.db

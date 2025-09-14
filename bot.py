@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 
 from config import Config
 from db import init_db
-from handlers import start, add, remove
+from handlers import start, add, remove, ls
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,6 +21,7 @@ async def main():
     dp.include_router(start.router)
     dp.include_router(add.router)
     dp.include_router(remove.router)
+    dp.include_router(ls.router)
 
     try:
         await dp.start_polling(bot)

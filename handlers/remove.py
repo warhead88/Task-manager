@@ -20,7 +20,6 @@ async def remove_task(message: types.Message):
                        .order_by(Task.id).all()
 
         if 0 <= index <= (len(tasks) - 1):
-            await message.answer(f"Задачи: {tasks}")
             session.delete(tasks[index])
             await message.answer(f"Задача '{tasks[index].description}' удалена.")
         else:

@@ -21,6 +21,10 @@ async def remove_task(message: types.Message):
 
         if 0 <= index <= (len(tasks) - 1):
             session.delete(tasks[index])
+            user = session.query(User).filter_by(id=message.from_user.id).first()
+            
+            user.removed = user.removed + 1
+
             await message.answer(f"Задача '{tasks[index].description}' удалена.")
         else:
             await message.answer("Такой задачи нет.")

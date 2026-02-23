@@ -1,4 +1,4 @@
-# 🚀 LibreNET Task Manager Bot
+# 🚀 Task Manager Bot
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Aiogram](https://img.shields.io/badge/Aiogram-3.22.0-green.svg)

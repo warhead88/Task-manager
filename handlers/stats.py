@@ -11,10 +11,6 @@ async def show_stats(message: types.Message):
     with get_session() as session:
         user = session.query(User).filter_by(id=message.from_user.id).first()
 
-        if not user:
-            await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
-            return
-
         deleted = user.deleted
         completed = user.completed
 

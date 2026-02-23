@@ -17,9 +17,6 @@ async def clear(message: types.Message):
             session.query(Task).filter(Task.user_id == message.from_user.id).delete()
 
             user = session.query(User).filter_by(id=message.from_user.id).first()
-            if not user:
-                await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
-                return
 
             user.deleted = user.deleted + len(tasks)
             

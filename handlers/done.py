@@ -24,9 +24,6 @@ async def make_done(message: types.Message):
             session.delete(tasks[index])
 
             user = session.query(User).filter_by(id=message.from_user.id).first()
-            if not user:
-                await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
-                return
             
             user.completed = user.completed + 1
 

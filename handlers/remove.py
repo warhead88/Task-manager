@@ -24,9 +24,6 @@ async def remove_task(message: types.Message):
             session.delete(tasks[index])
 
             user = session.query(User).filter_by(id=message.from_user.id).first()
-            if not user:
-                await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
-                return
             
             user.deleted = user.deleted + 1
 

@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher
 from config import Config
 from db import init_db
 from handlers import start, add, remove, ls, done, clear, stats, help, echo
+from handlers.middleware import RegistrationMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,6 +18,8 @@ async def main():
     
     bot = Bot(token=Config.BOT_TOKEN)
     dp = Dispatcher()
+    
+    dp.message.middleware(RegistrationMiddleware())
 
     dp.include_router(start.router)
     dp.include_router(add.router)

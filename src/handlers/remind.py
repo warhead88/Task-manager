@@ -1,12 +1,14 @@
-from datetime import datetime, time, timedelta
+from datetime import datetime
 from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from sqlalchemy.future import select
 
 from src.db import get_session
 from src.tables import Task, User
+from src.utils import calculate_initial_remind_time
 
 router = Router()
 
@@ -17,8 +19,13 @@ class RemindForm(StatesGroup):
 
 @router.message(Command("remind"))
 async def remind_start(message: types.Message, state: FSMContext):
-    with get_session() as session:
-        tasks = session.query(Task).filter(Task.user_id == message.from_user.id).order_by(Task.id).all()
+    async with get_session() as session:
+        result = await session.execute(
+            select(Task)
+            .filter(Task.user_id == message.from_user.id)
+            .order_by(Task.id)
+        )
+        tasks = result.scalars().all()
         if not tasks:
             await message.answer("☕️ У тебя пока нет задач. Добавь их через /add.")
             return
@@ -42,8 +49,13 @@ async def process_task_number(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Введи просто число (номер задачи).")
         return
 
-    with get_session() as session:
-        tasks = session.query(Task).filter(Task.user_id == message.from_user.id).order_by(Task.id).all()
+    async with get_session() as session:
+        result = await session.execute(
+            select(Task)
+            .filter(Task.user_id == message.from_user.id)
+            .order_by(Task.id)
+        )
+        tasks = result.scalars().all()
         if 0 <= index < len(tasks):
             task_id = tasks[index].id
             await state.update_data(task_id=task_id)
@@ -73,8 +85,9 @@ async def process_recurrence(callback: types.CallbackQuery, state: FSMContext):
         "weekly": "Раз в неделю"
     }
     
-    with get_session() as session:
-        user = session.query(User).filter_by(id=callback.from_user.id).first()
+    async with get_session() as session:
+        result = await session.execute(select(User).filter_by(id=callback.from_user.id))
+        user = result.scalars().first()
         tz_offset = user.timezone if user else 0
 
     await callback.message.edit_text(
@@ -104,28 +117,17 @@ async def process_time(message: types.Message, state: FSMContext):
     task_id = data.get("task_id")
     recurrence = data.get("recurrence")
 
-    with get_session() as session:
-        user = session.query(User).filter_by(id=message.from_user.id).first()
+    now_utc = datetime.utcnow()
+
+    async with get_session() as session:
+        result = await session.execute(select(User).filter_by(id=message.from_user.id))
+        user = result.scalars().first()
         tz_offset = user.timezone if user else 0
         
-        # Convert local time to UTC
-        target_utc_time = (datetime.combine(datetime.utcnow().date(), time(h, m)) - timedelta(hours=tz_offset)).time()
-        
-        now_utc = datetime.utcnow()
-        remind_at = datetime.combine(now_utc.date(), target_utc_time)
-        
-        if remind_at <= now_utc:
-            remind_at += timedelta(days=1)
-            
-        while True:
-            if recurrence == "weekdays" and remind_at.weekday() >= 5:
-                remind_at += timedelta(days=1)
-            elif recurrence == "weekends" and remind_at.weekday() < 5:
-                remind_at += timedelta(days=1)
-            else:
-                break
+        remind_at = calculate_initial_remind_time(now_utc, h, m, tz_offset, recurrence)
 
-        task = session.query(Task).filter(Task.id == task_id).first()
+        task_res = await session.execute(select(Task).filter(Task.id == task_id))
+        task = task_res.scalars().first()
         if task:
             task.remind_at = remind_at
             task.recurrence = recurrence

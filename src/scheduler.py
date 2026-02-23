@@ -7,6 +7,8 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import Task
 
+from src.utils import get_next_recurrence_time
+
 async def check_reminders(bot: Bot):
     now = datetime.utcnow()
     async with get_session() as session:
@@ -26,29 +28,7 @@ async def check_reminders(bot: Bot):
                 print(f"Error sending reminder to {task.user_id}: {e}")
 
             # Update recurrence
-            if task.recurrence == "none":
-                task.remind_at = None
-            else:
-                next_remind = task.remind_at
-                while True:
-                    if task.recurrence == "daily":
-                        next_remind += timedelta(days=1)
-                    elif task.recurrence == "weekdays":
-                        next_remind += timedelta(days=1)
-                        if next_remind.weekday() >= 5:
-                            continue
-                    elif task.recurrence == "weekends":
-                        next_remind += timedelta(days=1)
-                        if next_remind.weekday() < 5:
-                            continue
-                    elif task.recurrence == "weekly":
-                        next_remind += timedelta(days=7)
-                    
-                    # Stop if next_remind is in the future
-                    if next_remind > now:
-                        break
-                
-                task.remind_at = next_remind
+            task.remind_at = get_next_recurrence_time(task.remind_at, task.recurrence, now)
 
 def setup_scheduler(bot: Bot) -> AsyncIOScheduler:
     scheduler = AsyncIOScheduler()

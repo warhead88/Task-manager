@@ -4,10 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 
 from tables import Base
+from config import Config
 
-DATABASE_URL = "sqlite:///./main.db"
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False}, echo=True)
+engine = create_engine(Config.DATABASE_URL, echo=Config.DEBUG)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -20,7 +19,7 @@ def get_session():
     try:
         yield session
         session.commit()
-    except:
+    except Exception:
         session.rollback()
         raise
     finally:

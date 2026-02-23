@@ -100,12 +100,15 @@ async def process_time(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Неверный формат! Введи время в виде ЧЧ:ММ (до 23:59).")
         return
 
+    data = await state.get_data()
+    task_id = data.get("task_id")
+    recurrence = data.get("recurrence")
+
     with get_session() as session:
         user = session.query(User).filter_by(id=message.from_user.id).first()
         tz_offset = user.timezone if user else 0
         
         # Convert local time to UTC
-        # Local time h:m -> UTC time (h - tz_offset):m
         target_utc_time = (datetime.combine(datetime.utcnow().date(), time(h, m)) - timedelta(hours=tz_offset)).time()
         
         now_utc = datetime.utcnow()

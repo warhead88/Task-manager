@@ -1,6 +1,5 @@
 .env
-__pycache__
+__pycache__/
+*.pyc
 .venv
-handlers/__pycache__
-keyboards/__pycache__
 main.db

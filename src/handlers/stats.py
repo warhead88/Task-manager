@@ -5,7 +5,9 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import User
 
+
 router = Router()
+
 
 @router.message(Command("stats"))
 async def show_stats(message: types.Message):

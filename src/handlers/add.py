@@ -7,15 +7,19 @@ from aiogram.fsm.state import State, StatesGroup
 from src.db import get_session
 from src.tables import Task
 
+
 router = Router()
+
 
 class Form(StatesGroup):
     waiting_for_text = State()
+
 
 @router.message(Command("add"))
 async def add_task(message: types.Message, state: FSMContext):
     await state.set_state(Form.waiting_for_text)
     await message.answer("🖊 Напиши текст своей задачи.\n(Или отправь 'отмена', если передумал).")
+
 
 @router.message(Form.waiting_for_text)
 async def process_text(message: types.Message, state: FSMContext):

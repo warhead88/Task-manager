@@ -18,10 +18,12 @@ SessionLocal = async_sessionmaker(
     autocommit=False
 )
 
+
 async def init_db():
     async with engine.begin() as conn:
         # Base.metadata.create_all is synchronous, use run_sync
         await conn.run_sync(Base.metadata.create_all)
+
 
 @asynccontextmanager
 async def get_session():

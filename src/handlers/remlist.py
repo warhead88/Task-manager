@@ -5,7 +5,9 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import Task, User
 
+
 router = Router()
+
 
 @router.message(Command("remlist"))
 async def list_reminders(message: types.Message):
@@ -17,7 +19,7 @@ async def list_reminders(message: types.Message):
         tasks_result = await session.execute(
             select(Task).filter(
                 Task.user_id == message.from_user.id,
-                Task.remind_at != None
+                Task.remind_at.is_not(None)
             ).order_by(Task.remind_at)
         )
         tasks = tasks_result.scalars().all()

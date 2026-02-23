@@ -5,7 +5,9 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import User, Task
 
+
 router = Router()
+
 
 @router.message(Command("clear"))
 async def clear(message: types.Message):
@@ -25,7 +27,7 @@ async def clear(message: types.Message):
             user = user_result.scalars().first()
 
             user.deleted = user.deleted + len(tasks)
-            
+
             await message.answer("🧹 Чистота! Ты очистил свой список задач.")
         else:
             await message.answer("☕️ У тебя и так всё чисто.")

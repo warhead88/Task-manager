@@ -1,8 +1,10 @@
 from typing import Any, Callable, Dict, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message
+from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import User
+
 
 class RegistrationMiddleware(BaseMiddleware):
     async def __call__(
@@ -18,12 +20,10 @@ class RegistrationMiddleware(BaseMiddleware):
         if event.text and event.text.startswith("/start"):
             return await handler(event, data)
 
-        from sqlalchemy.future import select
-
         async with get_session() as session:
             result = await session.execute(select(User).filter_by(id=event.from_user.id))
             user = result.scalars().first()
-            
+
         if not user:
             await event.answer(
                 "🤖 *Ой! Кажется, мы ещё не знакомы.*\n\n"

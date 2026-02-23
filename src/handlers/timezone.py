@@ -4,7 +4,9 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import User
 
+
 router = Router()
+
 
 @router.message(Command("timezone"))
 async def set_timezone(message: types.Message):
@@ -33,6 +35,9 @@ async def set_timezone(message: types.Message):
         user = result.scalars().first()
         if user:
             user.timezone = offset
-            await message.answer(f"✅ Часовой пояс успешно установлен: *UTC {offset:+}*", parse_mode="Markdown")
+            await message.answer(
+                f"✅ Часовой пояс успешно установлен: *UTC {offset:+}*",
+                parse_mode="Markdown"
+            )
         else:
             await message.answer("❌ Ошибка: пользователь не найден. Попробуй /start")

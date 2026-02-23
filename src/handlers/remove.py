@@ -5,7 +5,9 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import User, Task
 
+
 router = Router()
+
 
 @router.message(Command("remove"))
 async def remove_task(message: types.Message):
@@ -29,7 +31,7 @@ async def remove_task(message: types.Message):
 
             user_result = await session.execute(select(User).filter_by(id=message.from_user.id))
             user = user_result.scalars().first()
-            
+
             user.deleted = user.deleted + 1
 
             await message.answer(f"🗑 Ты удалил задачу: *{deleted_desc}*", parse_mode="Markdown")

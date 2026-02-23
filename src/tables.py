@@ -3,6 +3,7 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -10,6 +11,7 @@ class User(Base):
     completed = Column(Integer, nullable=False, default=0)
     deleted = Column(Integer, nullable=False, default=0)
     timezone = Column(Integer, default=0)
+
 
 class Task(Base):
     __tablename__ = "tasks"

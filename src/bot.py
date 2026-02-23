@@ -14,15 +14,14 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 
+
 async def main():
     await init_db()
-    
 
     bot = Bot(token=Config.BOT_TOKEN)
     dp = Dispatcher()
-    
-    dp.message.middleware(RegistrationMiddleware())
 
+    dp.message.middleware(RegistrationMiddleware())
     dp.include_router(start.router)
     dp.include_router(add.router)
     dp.include_router(remove.router)
@@ -37,7 +36,7 @@ async def main():
     dp.include_router(timezone.router)
     dp.include_router(echo.router)  # Этот роутер должен быть последним
 
-    scheduler = setup_scheduler(bot)
+    setup_scheduler(bot)
 
     try:
         await dp.start_polling(bot)

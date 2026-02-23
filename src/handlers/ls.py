@@ -7,6 +7,7 @@ from src.tables import Task
 
 router = Router()
 
+
 @router.message(Command("list"))
 async def show_tasks(message: types.Message):
     async with get_session() as session:
@@ -16,7 +17,7 @@ async def show_tasks(message: types.Message):
             .order_by(Task.id)
         )
         tasks = result.scalars().all()
-        
+
         if tasks:
             text = "📋 *Твой список задач:*\n\n" + "\n".join(
                 f"{i}. {task.description}" for i, task in enumerate(tasks, start=1)

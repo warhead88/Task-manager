@@ -5,7 +5,9 @@ from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import Task, User
 
+
 router = Router()
+
 
 @router.message(Command("done"))
 async def make_done(message: types.Message):
@@ -29,7 +31,7 @@ async def make_done(message: types.Message):
 
             user_result = await session.execute(select(User).filter_by(id=message.from_user.id))
             user = user_result.scalars().first()
-            
+
             user.completed = user.completed + 1
 
             await message.answer(f"🎉 Поздравляю! Ты выполнил задачу: *{completed_desc}*", parse_mode="Markdown")

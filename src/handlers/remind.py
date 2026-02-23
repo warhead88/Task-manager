@@ -1,5 +1,5 @@
 from datetime import datetime
-from aiogram import Router, types, F
+from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -10,12 +10,15 @@ from src.db import get_session
 from src.tables import Task, User
 from src.utils import calculate_initial_remind_time
 
+
 router = Router()
+
 
 class RemindForm(StatesGroup):
     waiting_for_task_number = State()
     waiting_for_recurrence = State()
     waiting_for_time = State()
+
 
 @router.message(Command("remind"))
 async def remind_start(message: types.Message, state: FSMContext):
@@ -33,8 +36,12 @@ async def remind_start(message: types.Message, state: FSMContext):
         text = "⏰ *Настройка напоминания*\n\nТвои задачи:\n" + "\n".join(
             f"{i}. {task.description}" for i, task in enumerate(tasks, start=1)
         )
-        await message.answer(text + "\n\nНапиши номер задачи, для которой хочешь включить напоминание\n(или 'отмена'):", parse_mode="Markdown")
+        await message.answer(
+            text + "\n\nНапиши номер задачи, для которой хочешь включить напоминание\n(или 'отмена'):",
+            parse_mode="Markdown"
+        )
         await state.set_state(RemindForm.waiting_for_task_number)
+
 
 @router.message(RemindForm.waiting_for_task_number)
 async def process_task_number(message: types.Message, state: FSMContext):
@@ -59,7 +66,7 @@ async def process_task_number(message: types.Message, state: FSMContext):
         if 0 <= index < len(tasks):
             task_id = tasks[index].id
             await state.update_data(task_id=task_id)
-            
+
             kb = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Единожды", callback_data="rec_none")],
                 [InlineKeyboardButton(text="Каждый день", callback_data="rec_daily")],
@@ -72,11 +79,12 @@ async def process_task_number(message: types.Message, state: FSMContext):
         else:
             await message.answer("❓ У тебя нет задачи под таким номером.")
 
+
 @router.callback_query(RemindForm.waiting_for_recurrence)
 async def process_recurrence(callback: types.CallbackQuery, state: FSMContext):
     recurrence = callback.data.split("_")[1]
     await state.update_data(recurrence=recurrence)
-    
+
     rec_texts = {
         "none": "Единожды",
         "daily": "Каждый день",
@@ -84,7 +92,7 @@ async def process_recurrence(callback: types.CallbackQuery, state: FSMContext):
         "weekends": "По выходным",
         "weekly": "Раз в неделю"
     }
-    
+
     async with get_session() as session:
         result = await session.execute(select(User).filter_by(id=callback.from_user.id))
         user = result.scalars().first()
@@ -97,6 +105,7 @@ async def process_recurrence(callback: types.CallbackQuery, state: FSMContext):
         parse_mode="Markdown"
     )
     await state.set_state(RemindForm.waiting_for_time)
+
 
 @router.message(RemindForm.waiting_for_time)
 async def process_time(message: types.Message, state: FSMContext):
@@ -123,7 +132,7 @@ async def process_time(message: types.Message, state: FSMContext):
         result = await session.execute(select(User).filter_by(id=message.from_user.id))
         user = result.scalars().first()
         tz_offset = user.timezone if user else 0
-        
+
         remind_at = calculate_initial_remind_time(now_utc, h, m, tz_offset, recurrence)
 
         task_res = await session.execute(select(Task).filter(Task.id == task_id))
@@ -131,8 +140,10 @@ async def process_time(message: types.Message, state: FSMContext):
         if task:
             task.remind_at = remind_at
             task.recurrence = recurrence
-            await message.answer(f"✅ Готово! Напомню о задаче '{task.description}' в {h:02d}:{m:02d} (по твоему времени).")
+            await message.answer(
+                f"✅ Готово! Напомню о задаче '{task.description}' в {h:02d}:{m:02d} (по твоему времени)."
+            )
         else:
             await message.answer("❌ Ошибка: задача не найдена.")
-            
+
     await state.clear()

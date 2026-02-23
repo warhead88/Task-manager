@@ -2,14 +2,18 @@ import asyncio
 from datetime import datetime, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram import Bot
+from sqlalchemy.future import select
 
 from src.db import get_session
 from src.tables import Task
 
 async def check_reminders(bot: Bot):
     now = datetime.utcnow()
-    with get_session() as session:
-        tasks = session.query(Task).filter(Task.remind_at != None, Task.remind_at <= now).all()
+    async with get_session() as session:
+        result = await session.execute(
+            select(Task).filter(Task.remind_at != None, Task.remind_at <= now)
+        )
+        tasks = result.scalars().all()
         for task in tasks:
             # Send reminder
             try:

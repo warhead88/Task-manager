@@ -1,26 +1,34 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from contextlib import contextmanager
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from contextlib import asynccontextmanager
 
 from src.tables import Base
 from src.config import Config
 
-engine = create_engine(Config.DATABASE_URL, echo=Config.DEBUG)
+# Ensure DATABASE_URL uses asyncpg
+# E.g. postgresql://user:pass@host/db -> postgresql+asyncpg://user:pass@host/db
+async_db_url = Config.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_async_engine(async_db_url, echo=Config.DEBUG)
 
-def init_db():
-    Base.metadata.create_all(bind=engine)
+SessionLocal = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+    autocommit=False
+)
 
-@contextmanager
-def get_session():
-    session = SessionLocal()
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+async def init_db():
+    async with engine.begin() as conn:
+        # Base.metadata.create_all is synchronous, use run_sync
+        await conn.run_sync(Base.metadata.create_all)
+
+@asynccontextmanager
+async def get_session():
+    async with SessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise

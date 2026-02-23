@@ -18,8 +18,11 @@ class RegistrationMiddleware(BaseMiddleware):
         if event.text and event.text.startswith("/start"):
             return await handler(event, data)
 
-        with get_session() as session:
-            user = session.query(User).filter_by(id=event.from_user.id).first()
+        from sqlalchemy.future import select
+
+        async with get_session() as session:
+            result = await session.execute(select(User).filter_by(id=event.from_user.id))
+            user = result.scalars().first()
             
         if not user:
             await event.answer(

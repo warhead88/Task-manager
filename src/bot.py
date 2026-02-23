@@ -15,8 +15,9 @@ logging.basicConfig(
 )
 
 async def main():
-    init_db()
+    await init_db()
     
+
     bot = Bot(token=Config.BOT_TOKEN)
     dp = Dispatcher()
     

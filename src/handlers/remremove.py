@@ -1,5 +1,6 @@
 from aiogram import Router, types
 from aiogram.filters import Command
+from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import Task
 
@@ -13,11 +14,14 @@ async def remove_reminder(message: types.Message):
         await message.answer("⚠️ Используй команду так: `/remremove 1` (где 1 — номер задачи из списка /remlist)", parse_mode="Markdown")
         return
 
-    with get_session() as session:
-        tasks = session.query(Task).filter(
-            Task.user_id == message.from_user.id,
-            Task.remind_at != None
-        ).order_by(Task.remind_at).all()
+    async with get_session() as session:
+        result = await session.execute(
+            select(Task).filter(
+                Task.user_id == message.from_user.id,
+                Task.remind_at != None
+            ).order_by(Task.remind_at)
+        )
+        tasks = result.scalars().all()
 
         if 0 <= index < len(tasks):
             task = tasks[index]

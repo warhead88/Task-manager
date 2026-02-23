@@ -1,6 +1,7 @@
 from datetime import timedelta
 from aiogram import Router, types
 from aiogram.filters import Command
+from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import Task, User
 
@@ -8,14 +9,18 @@ router = Router()
 
 @router.message(Command("remlist"))
 async def list_reminders(message: types.Message):
-    with get_session() as session:
-        user = session.query(User).filter_by(id=message.from_user.id).first()
+    async with get_session() as session:
+        user_result = await session.execute(select(User).filter_by(id=message.from_user.id))
+        user = user_result.scalars().first()
         tz_offset = user.timezone if user else 0
 
-        tasks = session.query(Task).filter(
-            Task.user_id == message.from_user.id,
-            Task.remind_at != None
-        ).order_by(Task.remind_at).all()
+        tasks_result = await session.execute(
+            select(Task).filter(
+                Task.user_id == message.from_user.id,
+                Task.remind_at != None
+            ).order_by(Task.remind_at)
+        )
+        tasks = tasks_result.scalars().all()
 
         if not tasks:
             await message.answer("🔔 У тебя нет активных напоминаний.")

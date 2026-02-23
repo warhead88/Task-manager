@@ -1,5 +1,6 @@
 from aiogram import Router, types
 from aiogram.filters import Command
+from sqlalchemy.future import select
 
 from src.db import get_session
 from src.tables import Task, User
@@ -14,16 +15,20 @@ async def make_done(message: types.Message):
         await message.answer("⚠️ Похоже, ты ввёл неверный номер или формат.\nПопробуй так: `/done 1`", parse_mode="Markdown")
         return
 
-    with get_session() as session:
-        tasks = session.query(Task)\
-                       .filter(Task.user_id == message.from_user.id)\
-                       .order_by(Task.id).all()
+    async with get_session() as session:
+        result = await session.execute(
+            select(Task)
+            .filter(Task.user_id == message.from_user.id)
+            .order_by(Task.id)
+        )
+        tasks = result.scalars().all()
 
         if 0 <= index <= (len(tasks) - 1):
             completed_desc = tasks[index].description
-            session.delete(tasks[index])
+            await session.delete(tasks[index])
 
-            user = session.query(User).filter_by(id=message.from_user.id).first()
+            user_result = await session.execute(select(User).filter_by(id=message.from_user.id))
+            user = user_result.scalars().first()
             
             user.completed = user.completed + 1
 

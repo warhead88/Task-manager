@@ -1,5 +1,6 @@
 from aiogram import Router, types
 from aiogram.filters import Command
+from sqlalchemy.future import select
 from src.db import get_session
 from src.tables import User
 
@@ -27,8 +28,9 @@ async def set_timezone(message: types.Message):
         await message.answer("⚠️ Пожалуйста, введи целое число от -12 до +14.")
         return
 
-    with get_session() as session:
-        user = session.query(User).filter_by(id=message.from_user.id).first()
+    async with get_session() as session:
+        result = await session.execute(select(User).filter_by(id=message.from_user.id))
+        user = result.scalars().first()
         if user:
             user.timezone = offset
             await message.answer(f"✅ Часовой пояс успешно установлен: *UTC {offset:+}*", parse_mode="Markdown")

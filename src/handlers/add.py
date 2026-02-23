@@ -26,7 +26,7 @@ async def process_text(message: types.Message, state: FSMContext):
         await message.answer("❌ Ладно, ничего не записываем.")
         return
 
-    with get_session() as session:
+    async with get_session() as session:
         new_task = Task(user_id=message.from_user.id, description=task_text)
         session.add(new_task)
 

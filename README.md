@@ -37,7 +37,7 @@ Task-manager/
 │   ├── scheduler.py   # Фоновые задачи (напоминания APScheduler)
 │   └── tables.py      # Модели SQLAlchemy
 ├── migrations/        # Миграции базы данных Alembic
-├── tests/             # Директория для будущих тестов
+├── tests/             # Директория для тестов
 ├── .env               # Файл с секретами (игнорируется в git)
 ├── docker-compose.yml # Описание контейнеров (Бот + PostgreSQL)
 ├── Dockerfile         # Сборка образа бота

@@ -4,8 +4,8 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from db import get_session
-from tables import Task
+from src.db import get_session
+from src.tables import Task
 
 router = Router()
 

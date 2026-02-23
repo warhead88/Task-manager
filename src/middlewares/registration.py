@@ -1,8 +1,8 @@
 from typing import Any, Callable, Dict, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message
-from db import get_session
-from tables import User
+from src.db import get_session
+from src.tables import User
 
 class RegistrationMiddleware(BaseMiddleware):
     async def __call__(

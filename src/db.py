@@ -3,8 +3,8 @@ from sqlalchemy.orm import sessionmaker
 
 from contextlib import contextmanager
 
-from tables import Base
-from config import Config
+from src.tables import Base
+from src.config import Config
 
 engine = create_engine(Config.DATABASE_URL, echo=Config.DEBUG)
 

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "task-manager-bot"
+version = "0.1.0"
+description = "Telegram Task Manager Bot"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiogram==3.22.0",
+    "sqlalchemy==2.0.43",
+    "psycopg2-binary==2.9.9",
+    "python-dotenv==1.1.1",
+    "apscheduler==3.11.0",
+    "alembic==1.14.1",
+    "asyncpg==0.30.0",
+]

@@ -1,8 +1,8 @@
 from aiogram import Router, types
 from aiogram.filters import Command
 
-from db import get_session
-from tables import Task
+from src.db import get_session
+from src.tables import Task
 
 router = Router()
 

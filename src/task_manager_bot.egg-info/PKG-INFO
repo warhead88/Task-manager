@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: task-manager-bot
+Version: 0.1.0
+Summary: Telegram Task Manager Bot
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: aiogram==3.22.0
+Requires-Dist: sqlalchemy==2.0.43
+Requires-Dist: psycopg2-binary==2.9.9
+Requires-Dist: python-dotenv==1.1.1
+Requires-Dist: apscheduler==3.11.0
+Requires-Dist: alembic==1.14.1
+Requires-Dist: asyncpg==0.30.0

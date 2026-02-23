@@ -12,10 +12,15 @@ async def show_stats(message: types.Message):
         user = session.query(User).filter_by(id=message.from_user.id).first()
 
         if not user:
-            await message.answer("Пожалуйста, напишите /start для регистрации.")
+            await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
             return
 
         deleted = user.deleted
         completed = user.completed
 
-    await message.answer(f"Ваша статистика:\n\nВыполнено задач: {completed};\nУдалено задач: {deleted}.")
+    await message.answer(
+        f"📊 *Твои достижения:*\n\n"
+        f"✅ Выполнил задач: {completed}\n"
+        f"🗑 Удалил задач: {deleted}",
+        parse_mode="Markdown"
+    )

@@ -13,6 +13,6 @@ async def start(message: types.Message):
         if not user:
             user = User(id=message.from_user.id, completed=0, deleted=0)
             session.add(user)
-            await message.answer("Привет! Это бот Таск-менеджер. Напиши '/help'")
+            await message.answer("✨ Привет! Я твой персональный Таск-менеджер.\n\nНапиши /help, чтобы узнать, что я умею.")
         else:
-            await message.answer("Узнать о функционале и командах можно с помощью команды help.")
+            await message.answer("📝 Ты уже в системе! Если забыл команды, просто набери /help.")

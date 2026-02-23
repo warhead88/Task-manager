@@ -15,7 +15,7 @@ class Form(StatesGroup):
 @router.message(Command("add"))
 async def add_task(message: types.Message, state: FSMContext):
     await state.set_state(Form.waiting_for_text)
-    await message.answer("Введи задачу (или напиши 'отмена' для отмены):")
+    await message.answer("🖊 Напиши текст своей задачи.\n(Или отправь 'отмена', если передумал).")
 
 @router.message(Form.waiting_for_text)
 async def process_text(message: types.Message, state: FSMContext):
@@ -23,12 +23,12 @@ async def process_text(message: types.Message, state: FSMContext):
 
     if task_text.lower() == "отмена":
         await state.clear()
-        await message.answer("Добавление задачи отменено.")
+        await message.answer("❌ Ладно, ничего не записываем.")
         return
 
     with get_session() as session:
         new_task = Task(user_id=message.from_user.id, description=task_text)
         session.add(new_task)
 
-    await message.answer("Задача сохранена.")
+    await message.answer("✅ Отлично! Я сохранил твою задачу.")
     await state.clear()

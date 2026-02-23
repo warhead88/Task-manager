@@ -18,11 +18,11 @@ async def clear(message: types.Message):
 
             user = session.query(User).filter_by(id=message.from_user.id).first()
             if not user:
-                await message.answer("Пожалуйста, напишите /start для регистрации.")
+                await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
                 return
 
             user.deleted = user.deleted + len(tasks)
             
-            await message.answer("Список задач очищен.")
+            await message.answer("🧹 Чистота! Ты очистил свой список задач.")
         else:
-            await message.answer("У вас нет задач.")
+            await message.answer("☕️ У тебя и так всё чисто.")

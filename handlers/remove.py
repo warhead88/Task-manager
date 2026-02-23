@@ -11,7 +11,7 @@ async def remove_task(message: types.Message):
     try:
         index = int(message.text.split()[1]) - 1
     except (IndexError, ValueError):
-        await message.answer("Введён неверный формат или номер задачи.")
+        await message.answer("⚠️ Похоже, ты ввёл неверный номер или формат.\nПопробуй так: `/remove 1`", parse_mode="Markdown")
         return
 
     with get_session() as session:
@@ -25,11 +25,11 @@ async def remove_task(message: types.Message):
 
             user = session.query(User).filter_by(id=message.from_user.id).first()
             if not user:
-                await message.answer("Пожалуйста, напишите /start для регистрации.")
+                await message.answer("🤖 Сначала тебе нужно познакомиться со мной.\nНапиши /start!")
                 return
             
             user.deleted = user.deleted + 1
 
-            await message.answer(f"Задача '{deleted_desc}' удалена.")
+            await message.answer(f"🗑 Ты удалил задачу: *{deleted_desc}*", parse_mode="Markdown")
         else:
-            await message.answer("Такой задачи нет.")
+            await message.answer("❓ У тебя нет задачи под таким номером.")

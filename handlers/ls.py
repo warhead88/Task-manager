@@ -14,9 +14,9 @@ async def show_tasks(message: types.Message):
                        .order_by(Task.id).all()
         
         if tasks:
-            text = "Задачи:\n" + "\n".join(
+            text = "📋 *Твой список задач:*\n\n" + "\n".join(
                 f"{i}. {task.description}" for i, task in enumerate(tasks, start=1)
             )
-            await message.answer(text)
+            await message.answer(text, parse_mode="Markdown")
         else:
-            await message.answer("У вас нет задач.")
+            await message.answer("☕️ Твой список пуст. Отдыхай!")

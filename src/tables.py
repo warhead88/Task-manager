@@ -9,6 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     completed = Column(Integer, nullable=False, default=0)
     deleted = Column(Integer, nullable=False, default=0)
+    timezone = Column(Integer, default=0)
 
 class Task(Base):
     __tablename__ = "tasks"

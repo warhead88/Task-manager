@@ -17,6 +17,7 @@ async def show_stats(message: types.Message):
     await message.answer(
         f"📊 *Твои достижения:*\n\n"
         f"✅ Выполнил задач: {completed}\n"
-        f"🗑 Удалил задач: {deleted}",
+        f"🗑 Удалил задач: {deleted}\n"
+        f"🌍 Часовой пояс: *UTC {user.timezone:+}*",
         parse_mode="Markdown"
     )

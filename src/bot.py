@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 
 from src.config import Config
 from src.db import init_db
-from src.handlers import start, add, remove, ls, done, clear, stats, help, echo, remind, remlist
+from src.handlers import start, add, remove, ls, done, clear, stats, help, echo, remind, remlist, timezone, remremove
 from src.middlewares import RegistrationMiddleware
 from src.scheduler import setup_scheduler
 
@@ -32,6 +32,8 @@ async def main():
     dp.include_router(help.router)
     dp.include_router(remind.router)
     dp.include_router(remlist.router)
+    dp.include_router(remremove.router)
+    dp.include_router(timezone.router)
     dp.include_router(echo.router)  # Этот роутер должен быть последним
 
     scheduler = setup_scheduler(bot)

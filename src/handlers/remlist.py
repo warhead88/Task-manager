@@ -1,13 +1,17 @@
+from datetime import timedelta
 from aiogram import Router, types
 from aiogram.filters import Command
 from src.db import get_session
-from src.tables import Task
+from src.tables import Task, User
 
 router = Router()
 
 @router.message(Command("remlist"))
 async def list_reminders(message: types.Message):
     with get_session() as session:
+        user = session.query(User).filter_by(id=message.from_user.id).first()
+        tz_offset = user.timezone if user else 0
+
         tasks = session.query(Task).filter(
             Task.user_id == message.from_user.id,
             Task.remind_at != None
@@ -25,9 +29,11 @@ async def list_reminders(message: types.Message):
             "weekly": "Раз в неделю"
         }
 
-        text = "⏰ *Твои активные напоминания:*\n\n"
+        text = f"⏰ *Твои активные напоминания (UTC {tz_offset:+}):*\n\n"
         for i, task in enumerate(tasks, start=1):
-            time_str = task.remind_at.strftime("%H:%M (UTC)")
+            # Convert UTC back to local for display
+            local_time = task.remind_at + timedelta(hours=tz_offset)
+            time_str = local_time.strftime("%H:%M")
             rec_str = rec_texts.get(task.recurrence, "Неизвестно")
             text += f"{i}. *{task.description}*\n   └ 🕒 {time_str} — {rec_str}\n\n"
 

@@ -6,7 +6,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from src.db import get_session
-from src.tables import Task
+from src.tables import Task, User
 
 router = Router()
 
@@ -73,9 +73,14 @@ async def process_recurrence(callback: types.CallbackQuery, state: FSMContext):
         "weekly": "Раз в неделю"
     }
     
+    with get_session() as session:
+        user = session.query(User).filter_by(id=callback.from_user.id).first()
+        tz_offset = user.timezone if user else 0
+
     await callback.message.edit_text(
         f"Выбрано: *{rec_texts.get(recurrence)}*.\n"
-        f"Теперь напиши время в формате ЧЧ:ММ (например, 14:30). Время по UTC.",
+        f"Теперь напиши время в формате ЧЧ:ММ (например, 14:30).\n"
+        f"У тебя установлен часовой пояс: *UTC {tz_offset:+}*.",
         parse_mode="Markdown"
     )
     await state.set_state(RemindForm.waiting_for_time)
@@ -95,31 +100,33 @@ async def process_time(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Неверный формат! Введи время в виде ЧЧ:ММ (до 23:59).")
         return
 
-    data = await state.get_data()
-    task_id = data["task_id"]
-    recurrence = data["recurrence"]
-    
-    now = datetime.utcnow()
-    target_time = time(h, m)
-    remind_at = datetime.combine(now.date(), target_time)
-    
-    if remind_at <= now:
-        remind_at += timedelta(days=1)
-        
-    while True:
-        if recurrence == "weekdays" and remind_at.weekday() >= 5:
-            remind_at += timedelta(days=1)
-        elif recurrence == "weekends" and remind_at.weekday() < 5:
-            remind_at += timedelta(days=1)
-        else:
-            break
-
     with get_session() as session:
+        user = session.query(User).filter_by(id=message.from_user.id).first()
+        tz_offset = user.timezone if user else 0
+        
+        # Convert local time to UTC
+        # Local time h:m -> UTC time (h - tz_offset):m
+        target_utc_time = (datetime.combine(datetime.utcnow().date(), time(h, m)) - timedelta(hours=tz_offset)).time()
+        
+        now_utc = datetime.utcnow()
+        remind_at = datetime.combine(now_utc.date(), target_utc_time)
+        
+        if remind_at <= now_utc:
+            remind_at += timedelta(days=1)
+            
+        while True:
+            if recurrence == "weekdays" and remind_at.weekday() >= 5:
+                remind_at += timedelta(days=1)
+            elif recurrence == "weekends" and remind_at.weekday() < 5:
+                remind_at += timedelta(days=1)
+            else:
+                break
+
         task = session.query(Task).filter(Task.id == task_id).first()
         if task:
             task.remind_at = remind_at
             task.recurrence = recurrence
-            await message.answer(f"✅ Готово! Напомню о задаче '{task.description}' в {h:02d}:{m:02d} (UTC).")
+            await message.answer(f"✅ Готово! Напомню о задаче '{task.description}' в {h:02d}:{m:02d} (по твоему времени).")
         else:
             await message.answer("❌ Ошибка: задача не найдена.")
             

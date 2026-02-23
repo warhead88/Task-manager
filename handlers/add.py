@@ -21,8 +21,6 @@ async def add_task(message: types.Message, state: FSMContext):
 async def process_text(message: types.Message, state: FSMContext):
     task_text = message.text
 
-    await state.update_data(task=task_text)
-
     with get_session() as session:
         new_task = Task(user_id=message.from_user.id, description=task_text)
         session.add(new_task)

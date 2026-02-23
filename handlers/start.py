@@ -11,7 +11,7 @@ async def start(message: types.Message):
     with get_session() as session:
         user = session.query(User).filter_by(id=message.from_user.id).first()
         if not user:
-            user = User(id=message.from_user.id, completed=0, removed=0, cleared=0)
+            user = User(id=message.from_user.id, completed=0, deleted=0)
             session.add(user)
             await message.answer("Привет! Это бот Таск-менеджер. Напиши '/help'")
         else:

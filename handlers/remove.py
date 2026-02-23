@@ -20,11 +20,16 @@ async def remove_task(message: types.Message):
                        .order_by(Task.id).all()
 
         if 0 <= index <= (len(tasks) - 1):
+            deleted_desc = tasks[index].description
             session.delete(tasks[index])
-            user = session.query(User).filter_by(id=message.from_user.id).first()
-            
-            user.removed = user.removed + 1
 
-            await message.answer(f"Задача '{tasks[index].description}' удалена.")
+            user = session.query(User).filter_by(id=message.from_user.id).first()
+            if not user:
+                await message.answer("Пожалуйста, напишите /start для регистрации.")
+                return
+            
+            user.deleted = user.deleted + 1
+
+            await message.answer(f"Задача '{deleted_desc}' удалена.")
         else:
             await message.answer("Такой задачи нет.")

@@ -17,7 +17,11 @@ async def clear(message: types.Message):
             session.query(Task).filter(Task.user_id == message.from_user.id).delete()
 
             user = session.query(User).filter_by(id=message.from_user.id).first()
-            user.cleared = user.cleared + 1
+            if not user:
+                await message.answer("Пожалуйста, напишите /start для регистрации.")
+                return
+
+            user.deleted = user.deleted + len(tasks)
             
             await message.answer("Список задач очищен.")
         else:

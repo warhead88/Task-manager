@@ -20,11 +20,16 @@ async def make_done(message: types.Message):
                        .order_by(Task.id).all()
 
         if 0 <= index <= (len(tasks) - 1):
+            completed_desc = tasks[index].description
             session.delete(tasks[index])
+
             user = session.query(User).filter_by(id=message.from_user.id).first()
+            if not user:
+                await message.answer("Пожалуйста, напишите /start для регистрации.")
+                return
             
             user.completed = user.completed + 1
 
-            await message.answer(f"Задача '{tasks[index].description}' выполнена!")
+            await message.answer(f"Задача '{completed_desc}' выполнена!")
         else:
             await message.answer("Такой задачи нет.")

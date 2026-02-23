@@ -12,9 +12,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 
-init_db()
-
 async def main():
+    init_db()
+    
     bot = Bot(token=Config.BOT_TOKEN)
     dp = Dispatcher()
 

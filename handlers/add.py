@@ -15,7 +15,7 @@ class Form(StatesGroup):
 @router.message(Command("add"))
 async def add_task(message: types.Message, state: FSMContext):
     await state.set_state(Form.waiting_for_text)
-    await message.answer("Введи задачу:")
+    await message.answer("Введи задачу (или /cancel для отмены):")
 
 @router.message(Form.waiting_for_text)
 async def process_text(message: types.Message, state: FSMContext):

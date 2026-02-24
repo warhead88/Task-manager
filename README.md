@@ -1,12 +1,15 @@
-# 🚀 Task Manager Bot
-
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![Aiogram](https://img.shields.io/badge/Aiogram-3.22.0-green.svg)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.43-red.svg)
-![Alembic](https://img.shields.io/badge/Alembic-1.14.1-yellow.svg)
-![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)
-
-Современный и удобный Telegram-бот для управления задачами. Поддерживает создание, удаление, вывод списков, статистику, а также **гибкую систему напоминаний** с помощью фонового планировщика.
+<div align="center">
+    <img src="https://img.shields.io/badge/Telegram-Bot-blue?style=for-the-badge&logo=telegram">
+    <h1> 🚀 Task Manager Bot</h1>
+    <p><b>Современный и удобный Telegram-бот для управления задачами. Поддерживает создание, удаление, вывод списков, статистику, а также гибкую систему напоминаний с помощью фонового планировщика</b></p>
+    <p>
+         <img src="https://img.shields.io/badge/Python-3.11+-blue.svg">
+         <img src="https://img.shields.io/badge/Aiogram-3.22.0-green.svg">
+         <img src="https://img.shields.io/badge/SQLAlchemy-2.0.43-red.svg">
+         <img src="https://img.shields.io/badge/Alembic-1.14.1-yellow.svg">
+         <img src="https://img.shields.io/badge/Docker-Supported-blue.svg">
+    </p>
+</div>
 
 ---
 
